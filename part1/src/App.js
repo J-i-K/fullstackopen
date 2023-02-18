@@ -1,49 +1,46 @@
-// import logo from './logo.svg';
-// import './App.css';
+import { useState } from 'react'
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-const Hello = (props) => {
-  console.log(props)
+const History = (props) => {
+  if (props.allClicks.length === 0) {
+    return (
+      <div>
+        the app is used by pressing the buttons
+      </div>
+    )
+  }
   return (
     <div>
-      <p>
-        Hello {props.name}, you are {props.age} years old
-      </p>
+      button press history: {props.allClicks.join(' | ')}
     </div>
   )
 }
 
-const App = () => {
-  const name = 'Peter'
-  const age = 10
+const Button = ({ handleClick, text }) => (
+  <button onClick={handleClick}>
+    {text}
+  </button>
+)
 
+const App = () => {
+  const [value, setValue] = useState(10)
+  
+  const setToValue = (newValue) => () => {
+    console.log('value now', newValue)  // print the new value to console
+    setValue(newValue)
+  }
+
+  const Button = (props) => (
+    <button onClick={props.handleClick}>
+      {props.text}
+    </button>
+  )
+  
   return (
     <div>
-      <h1>Greetings</h1>
-      <Hello name='Maya' age={26 + 10} />
-      <Hello name={name} age={age} />
+      {value}
+      <Button handleClick={setToValue(1000)} text="thousand" />
+      <Button handleClick={setToValue(0)} text="reset" />
+      <Button handleClick={setToValue(value + 1)} text="increment" />
     </div>
   )
 }
