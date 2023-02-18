@@ -43,6 +43,9 @@ const App = () => {
       <Printer text={'Good'} value={good} />
       <Printer text={'Neutral'} value={neutral} />
       <Printer text={'Bad'} value={bad} />
+      <Printer text={'All'} value={good + neutral +bad} />
+      <Printer text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
+      <Printer text={'Positive %'} value={good/(good + neutral +bad)*100} />      
     </div>
   )
 }
