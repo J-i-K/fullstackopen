@@ -20,6 +20,16 @@ const Button = ({ handleClick, text }) => (
   </button>
 )
 
+const Statistics = ({good, neutral, bad}) => {
+  return (
+    <div>
+      <Printer text={'All'} value={good + neutral +bad} />
+      <Printer text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
+      <Printer text={'Positive %'} value={good/(good + neutral +bad)*100} />
+    </div>
+  )
+}
+
 const App = () => {
   console.log("Initializing")
   // save clicks of each button to its own state
@@ -43,9 +53,7 @@ const App = () => {
       <Printer text={'Good'} value={good} />
       <Printer text={'Neutral'} value={neutral} />
       <Printer text={'Bad'} value={bad} />
-      <Printer text={'All'} value={good + neutral +bad} />
-      <Printer text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
-      <Printer text={'Positive %'} value={good/(good + neutral +bad)*100} />      
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
