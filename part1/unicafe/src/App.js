@@ -20,12 +20,23 @@ const Button = ({ handleClick, text }) => (
   </button>
 )
 
-const Statistics = ({good, neutral, bad}) => {
+const Statistics = ({good, neutral, bad, footer}) => {
+  if (good > 0 || neutral > 0 || bad > 0)
   return (
     <div>
+      <PPrinter text={footer} />
+      <Printer text={'Good'} value={good} />
+      <Printer text={'Neutral'} value={neutral} />
+      <Printer text={'Bad'} value={bad} />
       <Printer text={'All'} value={good + neutral +bad} />
       <Printer text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
       <Printer text={'Positive %'} value={good/(good + neutral +bad)*100} />
+    </div>
+  )
+  else
+  return (
+    <div>
+      <PPrinter text={'No feedback given :('} />
     </div>
   )
 }
@@ -49,11 +60,7 @@ const App = () => {
       <Button handleClick={setGoodValue(good + 1)} text="Good" />
       <Button handleClick={setNeutralValue(neutral + 1)} text="Neutral" />
       <Button handleClick={setBadValue(bad + 1)} text="Bad" />
-      <PPrinter text={footer} />
-      <Printer text={'Good'} value={good} />
-      <Printer text={'Neutral'} value={neutral} />
-      <Printer text={'Bad'} value={bad} />
-      <Statistics good={good} neutral={neutral} bad={bad} />
+      <Statistics good={good} neutral={neutral} bad={bad} footer={footer} />
     </div>
   )
 }
