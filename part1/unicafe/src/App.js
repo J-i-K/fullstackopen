@@ -1,14 +1,13 @@
 import { useState } from 'react'
 
-const PPrinter = ({ text }) => {
+const Printer = ({ text }) => {
   console.log("Printer")
   return (
   <p>{text}</p>
   )
 }
 
-const Printer = ({ text, value }) => {
-  console.log("Printer")
+const StatisticLine = ({ text, value }) => {
   return (
     <li>{text}: {value}</li>
   )
@@ -24,19 +23,19 @@ const Statistics = ({good, neutral, bad, footer}) => {
   if (good > 0 || neutral > 0 || bad > 0)
   return (
     <div>
-      <PPrinter text={footer} />
-      <Printer text={'Good'} value={good} />
-      <Printer text={'Neutral'} value={neutral} />
-      <Printer text={'Bad'} value={bad} />
-      <Printer text={'All'} value={good + neutral +bad} />
-      <Printer text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
-      <Printer text={'Positive %'} value={good/(good + neutral +bad)*100} />
+      <Printer text={footer} />
+      <StatisticLine text={'Good'} value={good} />
+      <StatisticLine text={'Neutral'} value={neutral} />
+      <StatisticLine text={'Bad'} value={bad} />
+      <StatisticLine text={'All'} value={good + neutral +bad} />
+      <StatisticLine text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
+      <StatisticLine text={'Positive %'} value={good/(good + neutral +bad)*100} />
     </div>
   )
   else
   return (
     <div>
-      <PPrinter text={'No feedback given :('} />
+      <Printer text={'No feedback given :('} />
     </div>
   )
 }
@@ -56,7 +55,7 @@ const App = () => {
 
   return (
     <div>
-      <PPrinter text={header} />
+      <Printer text={header} />
       <Button handleClick={setGoodValue(good + 1)} text="Good" />
       <Button handleClick={setNeutralValue(neutral + 1)} text="Neutral" />
       <Button handleClick={setBadValue(bad + 1)} text="Bad" />
