@@ -14,9 +14,15 @@ const App = () => {
       id: persons.length + 1,
       name: newName
     }
-  
-    setPersons(persons.concat(personObject))
-    setNewName('')
+
+    if (persons.map(person =>
+      person.name).indexOf(newName) !== -1) {
+        alert(`${newName} is already added to phonebook and duplicates are not allowed!`);
+    }
+    else {
+      setPersons(persons.concat(personObject))
+      setNewName('')
+    }
   }
 
   const handleNameChange = (event) => {
