@@ -26,6 +26,48 @@ function numberOfVotes(votes, key) {
   }
 }
 
+function keyFinder(object, value) {
+  let keys = []
+  for (let y in object) {
+    console.log(object[y])
+    if (object[y] === value) {
+      keys = keys.concat(y)
+    }
+  }
+  return keys;
+}
+
+function maxValueFinder(votes) {
+  let max = 0
+  for (let x in votes) {
+    if (votes[x] > max) {
+      max = votes[x];
+    }
+  }
+  return max;
+}
+
+const Anecdote = ({ anecdotes, mostVotes, votes }) => {
+  console.log('votes: ', mostVotes)
+  return (
+    <p>
+      {anecdotes[parseInt(mostVotes)]}<br />
+      has {votes[parseInt(mostVotes)]} votes!
+    </p>
+  )
+}
+
+const MostVotedAnecdotes = ({ anecdotes, mostVotes, allVotes}) => {
+  if (mostVotes.length > 0) {
+    return (
+      <div>
+        <h1>Anecdote with the most votes:</h1><br />
+        <Anecdote anecdotes={anecdotes} mostVotes={mostVotes[0]} votes={allVotes} />
+      </div>
+    )
+  }
+}
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -49,19 +91,26 @@ const App = () => {
     console.log('In handleVote')
     const newVotes = {
       ...votes,
-      [selected]: selectionVotes += 1
+      [selected]: selectionVotes += 1,
     }
     setVotes(newVotes)
+    console.log(newVotes)
+    setMaxVotes(keyFinder(newVotes, maxValueFinder(newVotes)))
   }
+
+  const [maxVotes, setMaxVotes] = useState([])
 
   return (
     <div>
+      <h1>Anecdote for the day</h1>
       {anecdotes[selected]}
       <br />has {numberOfVotes(votes, selected)} votes<br />
       <Button handleClick={setAnecdoteValue(getIntegerBelow(anecdotes.length))} text="Get another random Anecdote" />
       <Button handleClick={handleVote} text="+1 this anecdote" />
+      <br />
+      <MostVotedAnecdotes anecdotes={anecdotes} mostVotes={maxVotes} allVotes={votes} />
     </div>
   )
 }
 
-export default App
+export default App;
