@@ -24,14 +24,14 @@ const Statistics = ({good, neutral, bad, footer}) => {
   return (
     <div>
       <Printer text={footer} />
-      <table>
+      <table><tbody>
       <StatisticLine text={'Good'} value={good} />
       <StatisticLine text={'Neutral'} value={neutral} />
       <StatisticLine text={'Bad'} value={bad} />
       <StatisticLine text={'All'} value={good + neutral +bad} />
       <StatisticLine text={'Avg'} value={Math.round((good + neutral * 0 - bad)/(good + neutral +bad) * 100) / 100} />
       <StatisticLine text={'Positive'} value={Math.round(good/(good + neutral +bad) * 1000) / 10} tailing={'%'}/>
-      </table>
+      </tbody></table>
     </div>
   )
   else
