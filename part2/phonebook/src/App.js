@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Person from './components/Person'
+import Persons from './components/Persons'
 import Input from './components/Input'
 
 const App = () => {
@@ -70,10 +70,7 @@ const App = () => {
         </div>
         {/* <div>debug: {newName}</div> */}
       </form>
-      <h2>Numbers</h2>
-      {personsToShow.map(person => 
-        <Person key={person.id} person={person} />
-      )}
+      <Persons persons={personsToShow} />
     </div>
   )
 }
