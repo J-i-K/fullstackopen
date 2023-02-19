@@ -7,9 +7,9 @@ const Printer = ({ text }) => {
   )
 }
 
-const StatisticLine = ({ text, value }) => {
+const StatisticLine = ({ text, value, tailing }) => {
   return (
-    <li>{text}: {value}</li>
+    <tr><td>{text}</td><td>{value}</td><td>{tailing}</td></tr>
   )
 }
 
@@ -24,18 +24,20 @@ const Statistics = ({good, neutral, bad, footer}) => {
   return (
     <div>
       <Printer text={footer} />
+      <table>
       <StatisticLine text={'Good'} value={good} />
       <StatisticLine text={'Neutral'} value={neutral} />
       <StatisticLine text={'Bad'} value={bad} />
       <StatisticLine text={'All'} value={good + neutral +bad} />
-      <StatisticLine text={'Avg'} value={(good + neutral * 0 - bad)/(good + neutral +bad)} />
-      <StatisticLine text={'Positive %'} value={good/(good + neutral +bad)*100} />
+      <StatisticLine text={'Avg'} value={Math.round((good + neutral * 0 - bad)/(good + neutral +bad) * 100) / 100} />
+      <StatisticLine text={'Positive'} value={Math.round(good/(good + neutral +bad) * 1000) / 10} tailing={'%'}/>
+      </table>
     </div>
   )
   else
   return (
     <div>
-      <Printer text={'No feedback given :('} />
+      <Printer text={'No feedback given :\'('} />
     </div>
   )
 }
