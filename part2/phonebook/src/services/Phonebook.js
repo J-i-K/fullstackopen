@@ -14,9 +14,15 @@ const create = newObject => {
   .catch(error => console.error(`Error creating record: ${error}!`))
 }
 
+const remove = (id, newObject) => {
+    const request = axios.delete(`${baseUrl}/${id}`)
+    return request.then(response => response)
+    .catch(error => console.error(`Error deleting record: ${error}!`))
+  }
+
 const update = (id, newObject) => {
   const request = axios.put(`${baseUrl}/${id}`, newObject)
   return request.then(response => response.data)
 }
 
-export default { get, create }
+export default { get, create, remove }

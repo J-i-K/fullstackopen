@@ -88,9 +88,9 @@ const App = () => {
         </div>
         {/* <div>debug: {newName}</div> */}
       </form>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} setPersons={setPersons}/>
     </div>
   )
 }
 
-export default App
+export default ( App )
