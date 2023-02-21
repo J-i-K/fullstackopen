@@ -32,7 +32,15 @@ const App = () => {
     }
     else if (persons.map(person =>
       person.name).indexOf(newName) !== -1) {
-        alert(`${newName} is already added to phonebook and duplicates are not allowed!`);
+        window.confirm(`${newName} is already added to phonebook, do you wish to update the number?`);
+        phonebookService
+        .update(persons.find(person => person.name === newName).id, personObject)
+        .then(response => {
+          console.log(response)
+          if (response.status === 200) {
+            setPersons(persons.filter(person => person.name !== response.data.name).concat(response.data))
+          }
+        })
     }
     else if (persons.map(person =>
       person.number).indexOf(newNumber) !== -1) {
