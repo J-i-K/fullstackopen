@@ -14,10 +14,15 @@ const create = newObject => {
   .catch(error => console.error(`Error creating record: ${error}!`))
 }
 
-const remove = (id, newObject) => {
+const remove = (id) => {
     const request = axios.delete(`${baseUrl}/${id}`)
-    return request.then(response => response)
-    .catch(error => console.error(`Error deleting record: ${error}!`))
+    return request.then(response => {
+        console.log('delete response')
+        return response
+    })
+    // .catch(error => {
+    //     console.log(`delete error ${error}`, error)
+    //     throw new Error(error)})
   }
 
 const update = (id, newObject) => {

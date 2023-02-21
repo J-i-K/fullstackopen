@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import Input from './components/Input'
 import phonebookService from './services/Phonebook'
+import Notify from './components/Notify'
 
 const App = () => {
 
@@ -9,6 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationStyle, setNotificationStyle] = useState('info')
 
   useEffect(() => {
     phonebookService
@@ -39,6 +42,13 @@ const App = () => {
           console.log(response)
           if (response.status === 200) {
             setPersons(persons.filter(person => person.name !== response.data.name).concat(response.data))
+            setNotificationMessage(
+              `Person ${response.data.name}'s number updated!`
+            )
+            setNotificationStyle('info')
+            setTimeout(() => {
+              setNotificationMessage(null)
+            }, 5000)
           }
         })
     }
@@ -53,6 +63,13 @@ const App = () => {
         console.log(response)
         if (response.status === 201) {
           setPersons(persons.concat(response.data))
+          setNotificationMessage(
+            `Added person ${response.data.name} to phonebook`
+          )
+          setNotificationStyle('info')
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
         }
         else {
           console.log(`Error ${response.status} with storing person: ${response.statusText}`)
@@ -86,6 +103,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notify message={notificationMessage} style={notificationStyle} />
       <Input inputName={'filter'} value={filter} onChange={handleFilterChange} />
       <h2>Add new person to phonebook</h2>
       <form onSubmit={addNumber}>
@@ -96,7 +114,7 @@ const App = () => {
         </div>
         {/* <div>debug: {newName}</div> */}
       </form>
-      <Persons persons={personsToShow} setPersons={setPersons}/>
+      <Persons persons={personsToShow} setPersons={setPersons} setNotificationMessage={setNotificationMessage} setNotificationStyle={setNotificationStyle} />
     </div>
   )
 }
