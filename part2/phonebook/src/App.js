@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import Input from './components/Input'
-import axios from 'axios'
+import phonebookService from './services/Phonebook'
 
 const App = () => {
 
@@ -11,10 +11,10 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    phonebookService
+      .get()
+      .then(persistedPhonebook => {
+        setPersons(persistedPhonebook)
       })
   }, [])
 
@@ -39,8 +39,8 @@ const App = () => {
         alert(`${newNumber} is already added to phonebook and duplicates are not allowed!`);
     }
     else {
-      axios
-      .post('http://localhost:3001/persons', personObject)
+      phonebookService
+      .create(personObject)
       .then(response => {
         console.log(response)
         if (response.status === 201) {
