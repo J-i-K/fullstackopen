@@ -22,7 +22,7 @@ const App = () => {
     event.preventDefault()
 
     const personObject = {
-      id: persons.length + 1,
+      // id: persons.length + 1,
       name: newName,
       number: newNumber
     }
@@ -39,7 +39,17 @@ const App = () => {
         alert(`${newNumber} is already added to phonebook and duplicates are not allowed!`);
     }
     else {
-      setPersons(persons.concat(personObject))
+      axios
+      .post('http://localhost:3001/persons', personObject)
+      .then(response => {
+        console.log(response)
+        if (response.status === 201) {
+          setPersons(persons.concat(response.data))
+        }
+        else {
+          console.log(`Error ${response.status} with storing person: ${response.statusText}`)
+        }
+      })
       setNewName('')
       setNewNumber('')      
     }
