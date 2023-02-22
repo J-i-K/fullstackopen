@@ -1,6 +1,6 @@
 import Results from './Results'
 
-const Search = ({ countries, search, setSearch }) => {
+const Search = ({ countries, search, setSearch, setSelection, selection }) => {
 
     console.log('Search')
     // console.log(countries, search)
@@ -9,6 +9,7 @@ const Search = ({ countries, search, setSearch }) => {
         console.log(event.target.value)
         setSearch(event.target.value)
         console.log(search)
+        setSelection(null)
     }
 
     return (
@@ -20,7 +21,7 @@ const Search = ({ countries, search, setSearch }) => {
                 onChange={handleSearchChange}
                 />
             </div>
-            <Results countries={countries} search={search} />
+            <Results countries={countries} search={search} setSelection={setSelection} selection={selection} />
         </div>
     )
 }
