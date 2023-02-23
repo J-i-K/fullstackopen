@@ -5,8 +5,8 @@ import Search from './components/Search'
 const App = () => {
 
   const [countries, setCountries] = useState([])
-  const [search, setSearch] = useState('')
-  const [selection, setSelection] = useState(null)
+  // const [search, setSearch] = useState('')
+  // const [selection, setSelection] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -19,7 +19,7 @@ const App = () => {
   }, [])
 
   return (
-    < Search countries={countries} search={search} setSearch={setSearch} setSelection={setSelection} selection={selection} />
+    < Search countries={countries} />// search={search} setSearch={setSearch} setSelection={setSelection} selection={selection} />
   );
 }
 

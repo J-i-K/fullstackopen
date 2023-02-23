@@ -1,6 +1,10 @@
+import { useState } from 'react'
 import Results from './Results'
 
-const Search = ({ countries, search, setSearch, setSelection, selection }) => {
+const Search = ({ countries }) => {
+
+    const [search, setSearch] = useState('')
+    const [selection, setSelection] = useState(null)
 
     console.log('Search')
     // console.log(countries, search)
