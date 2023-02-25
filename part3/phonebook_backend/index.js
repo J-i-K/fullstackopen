@@ -56,7 +56,15 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
   Contact.findById(request.params.id).then(contact => {
-    response.json(contact)
+    if (contact) {
+      response.json(contact)
+    } else {
+      response.status(404).send('Contact not found d[0.o]b')
+    }
+  })
+  .catch(error => {
+    console.log(error)
+    response.status(400).send('Bad request received, please rectify!')
   })
 })
 
@@ -85,14 +93,13 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const contact = {
-    id: Math.round(Math.random() * 100000000000),
+  const contact = new Contact({
     name: body.name,
     number: body.number
-  }
-  phonebook = phonebook.concat(contact)
-  
-  response.status(201).json(contact)
+  })
+  contact.save().then(savedContact => {
+    response.status(201).json(savedContact)
+  })
 })
 
 const PORT = process.env.PORT
