@@ -17,6 +17,8 @@ const Notify = ({ message, style }) => {
   
     
         switch (style) {
+            default:
+                return (<div></div>)
             case 'info':
                 return (
                     <div style={info}>

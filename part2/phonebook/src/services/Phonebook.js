@@ -8,7 +8,7 @@ const get = () => {
   .catch(error => console.error(`Error getting data: ${error}!`))
 }
 
-const create = newObject => {
+const create = (newObject) => {
   const request = axios.post(baseUrl, newObject)
   return request.then(response => response)
   .catch(error => console.error(`Error creating record: ${error}!`))
@@ -16,13 +16,7 @@ const create = newObject => {
 
 const remove = (id) => {
     const request = axios.delete(`${baseUrl}/${id}`)
-    return request.then(response => {
-        console.log('delete response')
-        return response
-    })
-    // .catch(error => {
-    //     console.log(`delete error ${error}`, error)
-    //     throw new Error(error)})
+    return request.then(response => response)
   }
 
 const update = (id, newObject) => {
@@ -30,4 +24,5 @@ const update = (id, newObject) => {
   return request.then(response => response)
 }
 
-export default { get, create, remove, update }
+const phonebookService = { get, create, remove, update }
+export default phonebookService
