@@ -9,7 +9,7 @@ const removePerson = ( id, persons, setPersons, setNotificationMessage, setNotif
       .remove(id)
       .then(response => {
         console.log(`Deletion response: ${response}`)
-        if (response.status === 200) {
+        if (response.status === 204) {
           setPersons(persons.filter(person => person.id !== id))
         }
       })

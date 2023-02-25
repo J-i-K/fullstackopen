@@ -69,15 +69,14 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const contact = phonebook.find(contact => contact.id === id)
-  phonebook = phonebook.filter(contact => contact.id !== id)
-
-  if (contact) {
-  response.status(204).send(`Contact with id ${id} deleted!`)
-  } else {
-    response.status(404).send('Contact not found d[0.o]b')
-  }
+  Contact.findByIdAndRemove(request.params.id).then(deletedContact => {
+    console.log(deletedContact)
+    if (deletedContact) {
+      response.status(204).send(`Contact with id ${request.params.id} deleted!`)
+    } else {
+      response.status(404).send('Contact not found d[0.o]b')  
+    }
+  })
 })
 
 app.post('/api/persons', (request, response) => {
