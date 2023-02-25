@@ -5,12 +5,15 @@ const morgan = require('morgan')
 morgan.token('postBody', (req) => JSON.stringify(req.body).toString())
 
 app.use(express.json())
+
 app.use(morgan('tiny', {
   skip: function (req, res) { return req.method === 'POST'}
 }))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postBody', {
   skip: function(req, res) { return req.method !== 'POST'}
 }))
+
+app.use(cors())
 
 let phonebook = [
   { 
