@@ -3,6 +3,12 @@ const app = express()
 
 app.use(express.json())
 
+const unknownEndpoint = (request, response) => {
+  response.status(404).send('Not found d{0_o]b')
+}
+
+app.use(unknownEndpoint)
+
 let notes = [
     {
       id: 1,
@@ -78,7 +84,7 @@ app.post('/api/notes', (request, response) => {
   notes = notes.concat(note)
 
   console.log(note)
-  
+
   response.json(note)
 })
 
