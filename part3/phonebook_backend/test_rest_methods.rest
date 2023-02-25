@@ -5,3 +5,13 @@ GET http://localhost:3011/api/persons/ HTTP/1.1
 
 #Get info
 GET http://localhost:3011/info HTTP/1.1
+
+###
+
+#Get a contact
+GET http://localhost:3011/api/persons/1 HTTP/1.1
+
+###
+
+#Delete a contact
+DELETE http://localhost:3011/api/persons/2 HTTP/1.1
