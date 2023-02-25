@@ -33,6 +33,17 @@ app.get('/api/persons', (request, response) => {
   response.json(phonebook)
 })
 
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const contact = phonebook.find(contact => contact.id === id)
+
+  if (contact) {
+    response.json(contact)
+  } else {
+    response.status(404).send('Contact not found d[0.o]b')
+  }
+})
+
 const PORT = 3011
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
