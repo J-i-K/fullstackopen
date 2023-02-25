@@ -19,8 +19,8 @@ const App = () => {
       .then(persistedPhonebook => {
         setPersons(persistedPhonebook)
       })
-      .catch(setPersons(persons))
-  })
+      .catch(setPersons([]))
+  }, [])
 
   const addNumber = (event) => {
     event.preventDefault()
