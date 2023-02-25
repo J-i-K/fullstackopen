@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
+const Contact = require('./models/contact')
 
 const morgan = require('morgan')
 morgan.token('postBody', (req) => JSON.stringify(req.body).toString())
@@ -14,6 +16,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 }))
 
 const cors = require('cors')
+const { default: mongoose } = require('mongoose')
 
 app.use(cors())
 
@@ -45,18 +48,16 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(phonebook)
+  Contact.find({}).then(contacts => {
+    console.log(contacts)
+    response.json(contacts)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const contact = phonebook.find(contact => contact.id === id)
-
-  if (contact) {
+  Contact.findById(request.params.id).then(contact => {
     response.json(contact)
-  } else {
-    response.status(404).send('Contact not found d[0.o]b')
-  }
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -94,7 +95,7 @@ app.post('/api/persons', (request, response) => {
   response.status(201).json(contact)
 })
 
-const PORT = process.env.PORT || 3011
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

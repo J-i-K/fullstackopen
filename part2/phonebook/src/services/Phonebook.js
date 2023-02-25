@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'https://jik-fullstackopen-backend.azurewebsites.net/api/persons'
+const baseUrl = 'http://localhost:3011/api/persons'
 
 const get = () => {
   const request = axios.get(baseUrl)
