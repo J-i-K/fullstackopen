@@ -13,6 +13,8 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
   skip: function(req, res) { return req.method !== 'POST'}
 }))
 
+const cors = require('cors')
+
 app.use(cors())
 
 let phonebook = [
@@ -89,7 +91,7 @@ app.post('/api/persons', (request, response) => {
   }
   phonebook = phonebook.concat(contact)
   
-  response.json(contact)
+  response.status(201).json(contact)
 })
 
 const PORT = process.env.PORT || 3011
