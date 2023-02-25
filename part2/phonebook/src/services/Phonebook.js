@@ -5,7 +5,7 @@ const baseUrl = 'https://jik-fullstackopen-backend.azurewebsites.net/persons'
 const get = () => {
   const request = axios.get(baseUrl)
   return request.then(response => response.data)
-  .catch(error => console.error(`Error getting data: ${error}!`))
+  //.catch(error => console.error(`Error getting data: ${error}!`))
 }
 
 const create = (newObject) => {
