@@ -65,6 +65,10 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ 
       error: 'Both name and number should be given to store a contact.' 
     })
+  } if (phonebook.map(contact => contact.name).indexOf(body.name) !== -1) {
+    return response.status(409).json({ 
+      error: 'Contact with the same name exists in the phonebook.' 
+    })
   }
 
   const contact = {
