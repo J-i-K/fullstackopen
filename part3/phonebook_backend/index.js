@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const Contact = require('./models/contact')
+const ErrorHandler = require('./middleware/errorHandler')
 
 const morgan = require('morgan')
 morgan.token('postBody', (req) => JSON.stringify(req.body).toString())
@@ -54,7 +55,7 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Contact.findById(request.params.id).then(contact => {
     if (contact) {
       response.json(contact)
@@ -62,10 +63,7 @@ app.get('/api/persons/:id', (request, response) => {
       response.status(404).send('Contact not found d[0.o]b')
     }
   })
-  .catch(error => {
-    console.log(error)
-    response.status(400).send('Bad request received, please rectify!')
-  })
+  .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -100,6 +98,8 @@ app.post('/api/persons', (request, response) => {
     response.status(201).json(savedContact)
   })
 })
+
+app.use(ErrorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
