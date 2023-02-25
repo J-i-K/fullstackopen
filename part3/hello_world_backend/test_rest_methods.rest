@@ -1,0 +1,23 @@
+#Get notes
+GET http://localhost:3010/api/notes HTTP/1.1
+
+###
+
+#Get a note
+GET http://localhost:3010/api/notes/1 HTTP/1.1
+
+###
+
+#Delete a note
+DELETE http://localhost:3010/api/notes/1 HTTP/1.1
+
+###
+
+# Create a note
+POST http://localhost:3010/api/notes/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "content": "Testing with VSCode REST plugin",
+    "important": false
+}
