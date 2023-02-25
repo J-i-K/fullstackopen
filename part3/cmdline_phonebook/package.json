@@ -1,0 +1,15 @@
+{
+    "name": "cmdline_phonebook",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "author": "J-i-K",
+    "license": "MIT",
+    "dependencies": {
+      "mongoose": "^6.10.0"
+    }
+  }
+  
