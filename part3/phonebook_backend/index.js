@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let phonebook = [
   { 
     "id": 1,
@@ -54,6 +56,25 @@ app.delete('/api/persons/:id', (request, response) => {
   } else {
     response.status(404).send('Contact not found d[0.o]b')
   }
+})
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'Both name and number should be given to store a contact.' 
+    })
+  }
+
+  const contact = {
+    id: Math.round(Math.random() * 100000000000),
+    name: body.name,
+    number: body.number
+  }
+  phonebook = phonebook.concat(contact)
+  
+  response.json(contact)
 })
 
 const PORT = 3011
