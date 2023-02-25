@@ -20,7 +20,7 @@ const App = () => {
         setPersons(persistedPhonebook)
       })
       .catch(setPersons(persons))
-  }, [persons])
+  }, [])
 
   const addNumber = (event) => {
     event.preventDefault()
