@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const baseUrl = 'https://jik-fullstackopen-backend.azurewebsites.net/api/persons'
+const baseUrl = process.env.REACT_APP_API_URI
+console.log(baseUrl)
 
 const get = () => {
   const request = axios.get(baseUrl)
