@@ -54,6 +54,14 @@ const App = () => {
             }, 5000)
           }
         })
+        .catch(error => {
+          console.log('app error catch: ', error)
+          setNotificationMessage(`Error occured: ${error.response.data.error}`)
+          setNotificationStyle('error')
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 10000)
+        })
     }
     else if (persons.map(person =>
       person.number).indexOf(newNumber) !== -1) {
@@ -73,13 +81,21 @@ const App = () => {
           setTimeout(() => {
             setNotificationMessage(null)
           }, 5000)
+          setNewName('')
+          setNewNumber('')
         }
         else {
           console.log(`Error ${response.status} with storing person: ${response.statusText}`)
         }
       })
-      setNewName('')
-      setNewNumber('')
+      .catch(error => {
+        console.log('app error catch: ', error)
+        setNotificationMessage(`Error occured: ${error.response.data.error}`)
+        setNotificationStyle('error')
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 10000)
+      })
     }
   }
 

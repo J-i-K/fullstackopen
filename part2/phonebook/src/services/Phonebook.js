@@ -12,7 +12,7 @@ const get = () => {
 const create = (newObject) => {
   const request = axios.post(baseUrl, newObject)
   return request.then(response => response)
-  .catch(error => console.error(`Error creating record: ${error}!`))
+  // .catch(error => console.error(`Error creating record: ${error}!`))
 }
 
 const remove = (id) => {

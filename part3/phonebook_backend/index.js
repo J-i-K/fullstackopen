@@ -77,7 +77,7 @@ app.delete('/api/persons/:id', (request, response) => {
   })
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
   if (!body.name || !body.number) {
@@ -97,6 +97,7 @@ app.post('/api/persons', (request, response) => {
   contact.save().then(savedContact => {
     response.status(201).json(savedContact)
   })
+  .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -107,11 +108,11 @@ app.put('/api/persons/:id', (request, response, next) => {
       error: 'Both name and number should be given to store a contact.' 
     })
   } else {
-    contact = {
+    const contact = {
       name: body.name,
       number: body.number
     }
-    Contact.findByIdAndUpdate(request.params.id, contact, {new: true})
+    Contact.findByIdAndUpdate(request.params.id, contact, {new: true, runValidators: true, context: 'query'})
     .then(updatedContact => response.json(updatedContact))
     .catch(error => next(error))
   }
