@@ -32,12 +32,10 @@ const App = () => {
     }
 
     if (personObject.name === '' || personObject.number === '') {
-      alert(`Both the name and number has to be provided, current values for name or number are invalid!`)
-    }
-    else if (persons.map(person =>
-      person.name).indexOf(newName) !== -1) {
-        window.confirm(`${newName} is already added to phonebook, do you wish to update the number?`);
-        phonebookService
+      alert('Both the name and number has to be provided, current values for name or number are invalid!')
+    } else if (persons.map(person => person.name).indexOf(newName) !== -1) {
+      window.confirm(`${newName} is already added to phonebook, do you wish to update the number?`)
+      phonebookService
         .update(persons.find(person => person.name === newName).id, personObject)
         .then(response => {
           console.log(response)
@@ -62,8 +60,7 @@ const App = () => {
             setNotificationMessage(null)
           }, 10000)
         })
-    }
-    else if (persons.map(person =>
+      } else if (persons.map(person =>
       person.number).indexOf(newNumber) !== -1) {
         alert(`${newNumber} is already added to phonebook and duplicates are not allowed!`);
     }
@@ -129,7 +126,7 @@ const App = () => {
         <Input inputName={'name'} value={newName} onChange={handleNameChange} />
         <Input inputName={'number'} value={newNumber} onChange={handleNumberChange} />
         <div>
-          <button type="submit">add</button>
+          <button type='submit'>add</button>
         </div>
         {/* <div>debug: {newName}</div> */}
       </form>

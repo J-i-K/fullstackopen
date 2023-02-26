@@ -10,39 +10,15 @@ morgan.token('postBody', (req) => JSON.stringify(req.body).toString())
 app.use(express.json())
 
 app.use(morgan('tiny', {
-  skip: function (req, res) { return req.method === 'POST'}
+  skip: function (req) { return req.method === 'POST'}
 }))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postBody', {
-  skip: function(req, res) { return req.method !== 'POST'}
+  skip: function(req) { return req.method !== 'POST'}
 }))
 
 const cors = require('cors')
-const { default: mongoose } = require('mongoose')
 
 app.use(cors())
-
-let phonebook = [
-  { 
-    "id": 1,
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": 2,
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": 3,
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": 4,
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
 
 app.get('/info', (request, response) => {
   Contact.find({}).then(contacts => response.send(`The Phonebook has ${contacts.length} contacts available<br /><br />Date and time:<br />${Date()}`))
@@ -56,14 +32,15 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-  Contact.findById(request.params.id).then(contact => {
-    if (contact) {
-      response.json(contact)
-    } else {
-      response.status(404).send('Contact not found d[0.o]b')
-    }
-  })
-  .catch(error => next(error))
+  Contact.findById(request.params.id)
+    .then(contact => {
+      if (contact) {
+        response.json(contact)
+      } else {
+        response.status(404).send('Contact not found d[0.o]b')
+      }
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -84,7 +61,7 @@ app.post('/api/persons', (request, response, next) => {
     return response.status(400).json({ 
       error: 'Both name and number should be given to store a contact.' 
     })
-  } if (phonebook.map(contact => contact.name).indexOf(body.name) !== -1) {
+  } if (Contact.find({}).then(contacts => contacts).map(contact => contact.name).indexOf(body.name) !== -1) {
     return response.status(409).json({ 
       error: 'Contact with the same name exists in the phonebook.' 
     })
@@ -94,10 +71,11 @@ app.post('/api/persons', (request, response, next) => {
     name: body.name,
     number: body.number
   })
-  contact.save().then(savedContact => {
-    response.status(201).json(savedContact)
-  })
-  .catch(error => next(error))
+  contact.save()
+    .then(savedContact => {
+      response.status(201).json(savedContact)
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -113,8 +91,8 @@ app.put('/api/persons/:id', (request, response, next) => {
       number: body.number
     }
     Contact.findByIdAndUpdate(request.params.id, contact, {new: true, runValidators: true, context: 'query'})
-    .then(updatedContact => response.json(updatedContact))
-    .catch(error => next(error))
+      .then(updatedContact => response.json(updatedContact))
+      .catch(error => next(error))
   }
 })
 
@@ -122,5 +100,5 @@ app.use(ErrorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
