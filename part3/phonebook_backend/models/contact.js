@@ -16,11 +16,24 @@ mongoose.connect(url)
 
 const contactSchema = new mongoose.Schema({
     name: {
-        type:String,
+        type: String,
         minLength: [3, 'Minimum required name length is 3, got {VALUE}'],
         required: true
     },
-    number: String
+    number: {
+        type: String,
+        validate: {
+            validator: function formatValidator (number) {
+                console.log('validating format')
+                if (number.indexOf('-') !== -1) {
+                    return /\d{2,3}-\d+/.test(number)
+                }
+                else {return true}
+            },
+            message: props => `${props.value} is not of expected format, if there is a hyphen then first part must have between 2 and 3 numbers!`
+        },
+        minLength: [8, 'Expected length of number is 8!']
+    }
 })
 
 contactSchema.set('toJSON', {
