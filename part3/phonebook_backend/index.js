@@ -45,7 +45,7 @@ let phonebook = [
 ]
 
 app.get('/info', (request, response) => {
-  response.send(`The Phonebook has ${phonebook.length} contacts available<br /><br />Date and time:<br />${Date()}`)
+  Contact.find({}).then(contacts => response.send(`The Phonebook has ${contacts.length} contacts available<br /><br />Date and time:<br />${Date()}`))
 })
 
 app.get('/api/persons', (request, response) => {
@@ -97,6 +97,24 @@ app.post('/api/persons', (request, response) => {
   contact.save().then(savedContact => {
     response.status(201).json(savedContact)
   })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'Both name and number should be given to store a contact.' 
+    })
+  } else {
+    contact = {
+      name: body.name,
+      number: body.number
+    }
+    Contact.findByIdAndUpdate(request.params.id, contact, {new: true})
+    .then(updatedContact => response.json(updatedContact))
+    .catch(error => next(error))
+  }
 })
 
 app.use(ErrorHandler)

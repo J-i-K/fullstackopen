@@ -43,6 +43,8 @@ const App = () => {
           console.log(response)
           if (response.status === 200) {
             setPersons(persons.filter(person => person.name !== response.data.name).concat(response.data))
+            setNewName('')
+            setNewNumber('')
             setNotificationMessage(
               `Person ${response.data.name}'s number updated!`
             )
@@ -77,7 +79,7 @@ const App = () => {
         }
       })
       setNewName('')
-      setNewNumber('')      
+      setNewNumber('')
     }
   }
 
