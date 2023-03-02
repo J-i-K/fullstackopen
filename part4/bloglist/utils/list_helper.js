@@ -26,4 +26,22 @@ const objectWihHighestValueFromListOfObjects = (list, attr) => {
   return list[objectIndex] || {}
 }
 
-module.exports = { dummy, totalLikes, objectWihHighestValueFromListOfObjects}
+const attrFromListOfObjectsWithHighestCountOfObjects = (list, attr) => {
+  let max = 0
+  let attrs = [...new Set(list.map(object => object[attr]))].filter(object => typeof object !== 'undefined')
+  let attrsOut = []
+  for (let x in attrs) {
+    let obj = {}
+    obj[attr] = attrs[x]
+    obj['count'] = list.filter(object => object[attr] === attrs[x]).length
+    attrsOut.push(obj)
+  }
+  for (let x in attrsOut) {
+    if (attrsOut[x].count > max) {
+      max = attrsOut[x].count
+    }
+  }
+  return attrsOut.filter(object => object.count === max)
+}
+
+module.exports = { dummy, totalLikes, objectWihHighestValueFromListOfObjects, attrFromListOfObjectsWithHighestCountOfObjects }
