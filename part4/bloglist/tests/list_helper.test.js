@@ -62,3 +62,21 @@ describe('mostBlogs', () => {
     expect(listHelper.attrFromListOfObjectsWithHighestCountOfObjects([{author: 1}, {author: 2}, {author: 3}, {authror: 1}], 'author')).toEqual([{author: 1, count: 1}, {author: 2, count: 1}, {author: 3, count: 1}])
   })
 })
+
+describe('mostLikes', () => {
+  test('the authors with most likes', () => {
+    expect(listHelper.attrFromListOfObjectsWithHighestCountOfAttr2([{author: 1, likes: 1}, {author: 2, likes: 2}, {author: 3, likes:3}, {author: 3, likes: 3}], 'author', 'likes')).toEqual([{author: 3, count: 6}])
+  })
+  test('the authors with most blogs where list is empty returns an empty list', () => {
+    expect(listHelper.attrFromListOfObjectsWithHighestCountOfAttr2([], 'author', 'likes')).toEqual([])
+  })
+  test('the authors with most blogs where some objects lack the likes attribute', () => {
+    expect(listHelper.attrFromListOfObjectsWithHighestCountOfAttr2([{author: 1, likes: 1}, {author: 2, likes: 2}, {author: 3}], 'author', 'likes')).toEqual([{author: 2, count: 2}])
+  })
+  test('the authors with most blogs where some objects lack the author attribute', () => {
+    expect(listHelper.attrFromListOfObjectsWithHighestCountOfAttr2([{author: 1, likes: 1}, {author: 2, likes: 2}, {likes: 30}], 'author', 'likes')).toEqual([{author: 2, count: 2}])
+  })
+  test('the authors with most blogs where multiple are returned', () => {
+    expect(listHelper.attrFromListOfObjectsWithHighestCountOfAttr2([{author: 1, likes: 1}, {author: 2, likes: 2}, {author: 3, likes:2}], 'author')).toEqual([{author: 2, count: 2}, {author: 3, count: 2}])
+  })
+})
