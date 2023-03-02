@@ -7,4 +7,23 @@ const totalLikes = (blogs) => {
     .reduce((a, b) => a + b, 0) || 0
 }
 
-module.exports = { dummy, totalLikes}
+const objectWihHighestValueFromListOfObjects = (list, attr) => {
+  console.log(list, attr)
+  let max = 0
+  let objectIndex = null
+  for (let obj in list) {
+    console.log(list[obj])
+    if (list[obj][attr] > max) {
+      max = list[obj][attr]
+    }
+  }
+  console.log(max)
+  for (let obj in list) {
+    if (list[obj][attr] === max) {
+      objectIndex = obj
+    }
+  }
+  return list[objectIndex] || {}
+}
+
+module.exports = { dummy, totalLikes, objectWihHighestValueFromListOfObjects}
