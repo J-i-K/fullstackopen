@@ -115,6 +115,35 @@ describe('createNewBlog', () => {
       .expect(400)
   }, 10000)
 })
+
+describe('Delete blog with id', () => {
+  const newBlog = {
+    author: 'AuthorToBeDeleted',
+    title: 'BlogToBeDeleted',
+    url: 'https://localhostToBeDeleted'
+  }
+
+  test('Delete a blog with an id', async () => {
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async response => {
+        await api.delete(`/api/blogs/${response.body.id}`)
+          .expect(204)
+      })
+  })
+
+  test('Delete a blog with an invalid id returns 404', async () => {
+    await api.delete('/api/blogs/64024a78c6c1840cdb3e39a3')
+      .expect(404)
+  })
+
+  test('Delete a blog without any id return 404', async () => {
+    await api.delete('/api/blogs')
+      .expect(404)
+  })
+})
   
 afterAll(async () => {
   await mongoose.connection.close()
