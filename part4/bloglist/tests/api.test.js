@@ -85,6 +85,21 @@ describe('createNewBlog', () => {
         )
       })
   }, 10000)
+
+  test('If created blog is missing likes property, it will default to 0', async () => {
+    delete newBlog.likes
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(response => {
+        expect(response.body).toEqual(
+          expect.objectContaining({
+            likes: 0
+          })
+        )
+      })
+  }, 10000)
 })
   
 afterAll(async () => {
