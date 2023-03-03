@@ -100,6 +100,20 @@ describe('createNewBlog', () => {
         )
       })
   }, 10000)
+
+  test('If the blog to be created is missing title, return 400', async () => {
+    delete newBlog.title
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  }, 10000)
+
+  test('If the blog to be created is missing url, return 400', async () => {
+    delete newBlog.url
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  }, 10000)
 })
   
 afterAll(async () => {
