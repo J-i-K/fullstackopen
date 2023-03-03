@@ -6,13 +6,11 @@ blogsApiRouter.get('/', async (request, response) => {
   response.json(blogs)
 })
 
-blogsApiRouter.post('/', (request, response) => {
+blogsApiRouter.post('/', async (request, response) => {
   const blog = new Blog(request.body)
 
-  blog.save()
-    .then(savedBlog => {
-      response.status(201).json(savedBlog)
-    })
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog)
 })
 
 module.exports = blogsApiRouter
