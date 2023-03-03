@@ -14,11 +14,30 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-test('correct amount of blogs are returned', async () => {
-  await api.get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-    .then(response => expect(response.body).toHaveLength(3))
+describe('getAllBlogs', () => {
+  test('correct amount of blogs are returned', async () => {
+    await api.get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+      .then((response) => {
+        expect(response.body).toHaveLength(helper.testBlogs.length)
+      })
+    }, 10000)
+
+  test('id property is included', async () => {
+    await api.get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+      .then((response) => {
+        expect(response.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.any(String)
+            })
+          ])
+        )
+      })
+    }, 10000)
 })
   
 afterAll(async () => {

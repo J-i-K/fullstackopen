@@ -8,16 +8,13 @@ const totalLikes = (blogs) => {
 }
 
 const objectWihHighestValueFromListOfObjects = (list, attr) => {
-  console.log(list, attr)
   let max = 0
   let objectIndex = null
   for (let obj in list) {
-    console.log(list[obj])
     if (list[obj][attr] > max) {
       max = list[obj][attr]
     }
   }
-  console.log(max)
   for (let obj in list) {
     if (list[obj][attr] === max) {
       objectIndex = obj
