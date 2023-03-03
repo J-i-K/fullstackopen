@@ -1,4 +1,4 @@
-const dummy = (blogs) => {
+const dummy = () => {
   return 1
 }
 
@@ -51,15 +51,15 @@ const attrFromListOfObjectsWithHighestCountOfAttr2 = (list, attr, attr2) => {
   for (let x in attrs) {
     let obj = {}
     obj[attr] = attrs[x]
-    obj['count'] = list.filter(object => object[attr] === attrs[x]).map(object => object.likes).reduce((a, b) => a + b, 0) || 0
+    obj[attr2] = list.filter(object => object[attr] === attrs[x]).map(object => object[attr2]).reduce((a, b) => a + b, 0) || 0
     attrsOut.push(obj)
   }
   for (let x in attrsOut) {
-    if (attrsOut[x].count > max) {
-      max = attrsOut[x].count
+    if (attrsOut[x][attr2] > max) {
+      max = attrsOut[x][attr2]
     }
   }
-  return attrsOut.filter(object => object.count === max)
+  return attrsOut.filter(object => object[attr2] === max)
 }
 
 module.exports = { dummy, totalLikes, objectWihHighestValueFromListOfObjects, attrFromListOfObjectsWithHighestCountOfObjects, attrFromListOfObjectsWithHighestCountOfAttr2 }
