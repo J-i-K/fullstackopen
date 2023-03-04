@@ -37,6 +37,41 @@ describe('User creation', () => {
       .expect('Content-Type', /application\/json/)
   }, 10000)
 
+  test('Create a duplicate user fails', async () => {
+    await api.post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async () => {
+        await api.post('/api/users')
+          .send(newUser)
+          .expect(409)
+          .expect(/`username` to be unique/)
+      })
+  }, 10000)
+
+  test('Create a user with too short username returns 400', async () => {
+    await api.post('/api/users')
+      .send({
+        username: 'a',
+        name: newUser.name,
+        password: newUser.password
+      })
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+  }, 10000)
+
+  test('Create a user with a very weak password returns 400', async () => {
+    await api.post('/api/users')
+      .send({
+        username: newUser.username,
+        name: newUser.name,
+        password: 'pw'
+      })
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+  }, 10000)
+
   test('After user creation, there is a user', async () => {
     await api.post('/api/users')
       .send(newUser)

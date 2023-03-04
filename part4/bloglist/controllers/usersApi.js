@@ -9,16 +9,16 @@ usersApiRouter.get('/', async (request, response) => {
 
 usersApiRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
-  if (username && password) {
+  if (username && password && password.length >= 3) {
     const saltRounds = process.env.NODE_ENV === 'prd'
-    ? 30
-    : 5
+      ? 30
+      : 5
     const pwHash = await bcrypt.hash(password, saltRounds)
     const user = new User({
       username: username,
       name: name
-      ? name
-      : username,
+        ? name
+        : username,
       pwHash: pwHash
     })
     const createdUser = await user.save()
@@ -31,7 +31,7 @@ usersApiRouter.post('/', async (request, response) => {
     }
   } else {
     response.status(400).json({
-      error: 'Invalid request'
+      error: 'Invalid username or password'
     })
   }
 })
