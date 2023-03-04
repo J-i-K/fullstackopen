@@ -1,18 +1,16 @@
 const blogsApiRouter = require('express').Router()
 const Blog = require('../models/blog')
-const user = require('../models/user')
-const User = require('../models/user')
 
 blogsApiRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
-  .populate('user', {username:1, name: 1})
+    .populate('user', {username:1, name: 1})
   response.json(blogs)
 })
 
 blogsApiRouter.post('/', async (request, response) => {
   if (!request?.user?._id) {
     return response.status(401).json({
-        error: 'invalid token'
+      error: 'invalid token'
     })
   }
   const body = request.body
@@ -27,18 +25,18 @@ blogsApiRouter.post('/', async (request, response) => {
     })
 
     if (!blog.title || !blog.url) {
-        response.status(400).json({
+      response.status(400).json({
         error: 'Title and Url are mandatory.'
-        })
+      })
     } else {
-        const savedBlog = await blog.save()
-        user.blogs = user.blogs.concat(savedBlog._id)
-        await user.save()
-        response.status(201).json(savedBlog)
+      const savedBlog = await blog.save()
+      user.blogs = user.blogs.concat(savedBlog._id)
+      await user.save()
+      response.status(201).json(savedBlog)
     }
   } else {
     response.status(409).json({
-        error: 'looks like data is missing'
+      error: 'looks like data is missing'
     })
   }
 })
@@ -46,24 +44,26 @@ blogsApiRouter.post('/', async (request, response) => {
 blogsApiRouter.delete('/:id', async (request, response) => {
   if (!request?.user?._id) {
     return response.status(401).json({
-        error: 'invalid token'
+      error: 'invalid token'
     })
   }
   const blogId = request.params.id
+  const user = request.user
   const toBeDeletedBlog = await Blog.findById(blogId)
   if (toBeDeletedBlog) {
-    if (toBeDeletedBlog.user.toString() === request.user._id.toString()) {
+    if (toBeDeletedBlog.user.toString() === user._id.toString()) {
       const deletedBlog = await Blog.findByIdAndRemove(toBeDeletedBlog._id.toString())
       if (deletedBlog) {
+        user.blogs = user.blogs.filter(x => x.toString() !== deletedBlog._id.toString())
+        await user.save()
         response.status(204).json({
-          status: `Blog with id:${deletedBlog.id} deleted`
+          status: `Blog with id: ${deletedBlog._id.toString()} deleted`
         })
       }
     } else {
-        response.status(403).json({
-            error: 'Forbidden'
-
-        })
+      response.status(403).json({
+        error: 'Forbidden'
+      })
     }
   } else {
     response.status(404).json({
@@ -75,25 +75,35 @@ blogsApiRouter.delete('/:id', async (request, response) => {
 blogsApiRouter.put('/:id', async (request, response) => {
   if (!request?.user?._id) {
     return response.status(401).json({
-        error: 'invalid token'
+      error: 'invalid token'
     })
   }
   const blogId = request.params.id
   const body = request.body
+  const user = request.user
   if (body.author && body.title && body.url) {
-    const updatedBlog = await Blog.findByIdAndUpdate(blogId, body, {new: true, runValidators: true, context: 'query'})
-    if (updatedBlog) {
-      response.status(200).json(updatedBlog)
+    const toBeUpdatedBlog = await Blog.findById(blogId)
+    if (toBeUpdatedBlog) {
+      if (toBeUpdatedBlog.user._id.toString() === user._id.toString()) {
+        const updatedBlog = await Blog.findByIdAndUpdate(toBeUpdatedBlog._id.toString(), body, {new: true, runValidators: true, context: 'query'})
+        if (updatedBlog) {
+          response.status(200).json(updatedBlog)
+        }
+      } else {
+        response.status(403).json({
+          error: 'Forbidden'
+        })
+      }
     } else {
       response.status(404).json({
-        error: 'not found'
+        error: 'Not found'
       })
     }
   } else {
     response.status(400).json({
-      error: 'invalid request'
+      error: 'Invalid request'
     })
-  }
+  } 
 })
 
 module.exports = blogsApiRouter

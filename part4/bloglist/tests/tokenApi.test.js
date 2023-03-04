@@ -13,21 +13,12 @@ beforeEach(async () => {
   await User.deleteMany({})
 
   const pwHash = await bcrypt.hash(process.env.PW, 5)
-    const user = new User({
-      username: 'testuser',
-      name: 'User, Test',
-      pwHash: pwHash
-    })
+  const user = new User({
+    username: 'testuser',
+    name: 'User, Test',
+    pwHash: pwHash
+  })
   createdUser = await user.save()
-//   if (createdUser) {
-//     const testBlogs = helper.testBlogs
-//       .map(blog => new Blog(blog))
-//     const promiseArray = testBlogs.map(blog => {
-//       blog.user = createdUser.id
-//       blog.save()
-//     })
-//     await Promise.all(promiseArray)
-//   }
 }, 10000)
 
 describe('Token tests', () => {
