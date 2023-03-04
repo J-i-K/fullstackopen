@@ -4,15 +4,32 @@ const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+
+let createdUser
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
-  const testBlogs = helper.testBlogs
-    .map(blog => new Blog(blog))
-  const promiseArray = testBlogs.map(blog => blog.save())
-  await Promise.all(promiseArray)
-})
+  const pwHash = await bcrypt.hash(process.env.PW, 5)
+    const user = new User({
+      username: 'testuser',
+      name: 'User, Test',
+      pwHash: pwHash
+    })
+  createdUser = await user.save()
+  if (createdUser) {
+    const testBlogs = helper.testBlogs
+      .map(blog => new Blog(blog))
+    const promiseArray = testBlogs.map(blog => {
+      blog.user = createdUser.id
+      blog.save()
+    })
+    await Promise.all(promiseArray)
+  }
+}, 10000)
 
 describe('getAllBlogs', () => {
   test('correct amount of blogs are returned', async () => {
@@ -38,6 +55,25 @@ describe('getAllBlogs', () => {
         )
       })
   }, 10000)
+
+  test('user is included for blogs', async () => {
+    await api.get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+      .then((response) => {
+        expect(response.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.any(String),
+              user: expect.objectContaining({
+                username: expect.any(String),
+                name: expect.any(String)
+              })
+            })
+          ])
+        )
+      })
+  }, 10000)
 })
 
 describe('createNewBlog', () => {
@@ -54,13 +90,14 @@ describe('createNewBlog', () => {
       .expect('Content-Type', /application\/json/)
   })
 
-  test('Number of logs is increased by 1', async () => {
+  test('Number of blogs is increased by 1', async () => {
+    // newBlog.user = createdUser.id
     await api.post('/api/blogs')
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .then(async () => {
-        await api.get('/api/blogs/')
+        await api.get('/api/blogs')
           .expect(200)
           .expect('Content-Type', /application\/json/)
           .then(getResponse => {
@@ -70,6 +107,7 @@ describe('createNewBlog', () => {
   }, 10000)
 
   test('Created blog matches the one sent', async () => {
+    // newBlog.user = createdUser.id
     await api.post('/api/blogs')
       .send(newBlog)
       .expect(201)
@@ -80,7 +118,8 @@ describe('createNewBlog', () => {
             id: response.body.id,
             author: newBlog.author,
             title: newBlog.title,
-            url: newBlog.url
+            url: newBlog.url,
+            user: createdUser.id
           })
         )
       })
@@ -102,16 +141,22 @@ describe('createNewBlog', () => {
   }, 10000)
 
   test('If the blog to be created is missing title, return 400', async () => {
-    delete newBlog.title
     await api.post('/api/blogs')
-      .send(newBlog)
+      .send({
+        author: newBlog.author,
+        url: newBlog.url,
+        // user: createdUser.id
+      })
       .expect(400)
   }, 10000)
 
   test('If the blog to be created is missing url, return 400', async () => {
-    delete newBlog.url
     await api.post('/api/blogs')
-      .send(newBlog)
+    .send({
+      author: newBlog.author,
+      title: newBlog.title,
+      // user: createdUser.id
+    })
       .expect(400)
   }, 10000)
 })
@@ -153,6 +198,7 @@ describe('Bump the number of likes', () => {
   }
 
   test('Add one like to blog', async () => {
+    newBlog.user = createdUser.id
     await api.post('/api/blogs/')
       .send(newBlog)
       .expect(201)
@@ -182,7 +228,8 @@ describe('Bump the number of likes', () => {
           .send({
             author: newBlog.author,
             url: newBlog.url,
-            likes: 1
+            likes: 1,
+            // user: createdUser.id
           })
           .expect(400)
           .expect('Content-Type', /application\/json/)
@@ -199,7 +246,8 @@ describe('Bump the number of likes', () => {
           .send({
             title: newBlog.title,
             url: newBlog.url,
-            likes: 1
+            likes: 1,
+            // user: createdUser.id
           })
           .expect(400)
           .expect('Content-Type', /application\/json/)
@@ -216,7 +264,8 @@ describe('Bump the number of likes', () => {
           .send({
             author: newBlog.author,
             title: newBlog.title,
-            likes: 1
+            likes: 1,
+            // user: createdUser.id
           })
           .expect(400)
           .expect('Content-Type', /application\/json/)
@@ -229,7 +278,8 @@ describe('Bump the number of likes', () => {
         author: newBlog.author,
         title: newBlog.title,
         url: newBlog.url,
-        likes: 1
+        likes: 1,
+        // user: createdUser.id
       })
       .expect(404)
   })

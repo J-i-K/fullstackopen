@@ -4,7 +4,7 @@ const errorHandler = (error, request, response, next) => {
     return response.status(errorCode).send({ error: error.message })
   }
   if (error.name === 'ValidationError') {
-    if (error.errors.username.kind === 'unique') {
+    if (error.errors?.username?.kind === 'unique') {
       errorCode = 409
     } else {
       errorCode = 400
