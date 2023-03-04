@@ -5,6 +5,7 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const blogsApiRouter = require('./controllers/blogsApi')
+const usersApiRouter = require('./controllers/usersApi')
 
 mongoose.set('strictQuery', false)
 
@@ -15,5 +16,6 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/blogs', blogsApiRouter)
+app.use('/api/users', usersApiRouter)
 
 module.exports = app
