@@ -11,7 +11,7 @@ blogsApiRouter.post('/', async (request, response) => {
 
   if (!blog.title || !blog.url) {
     response.status(400).json({
-        error: 'Title and Url are mandatory.'
+      error: 'Title and Url are mandatory.'
     })
   } else {
     const savedBlog = await blog.save()
@@ -28,7 +28,26 @@ blogsApiRouter.delete('/:id', async (request, response) => {
     })
   } else {
     response.status(404).json({
-        error: 'Not found'
+      error: 'Not found'
+    })
+  }
+})
+
+blogsApiRouter.put('/:id', async (request, response) => {
+  const blogId = request.params.id
+  const body = request.body
+  if (body.author && body.title && body.url) {
+    const updatedBlog = await Blog.findByIdAndUpdate(blogId, body, {new: true, runValidators: true, context: 'query'})
+    if (updatedBlog) {
+      response.status(200).json(updatedBlog)
+    } else {
+      response.status(404).json({
+        error: 'not found'
+      })
+    }
+  } else {
+    response.status(400).json({
+      error: 'invalid request'
     })
   }
 })

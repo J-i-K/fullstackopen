@@ -144,6 +144,101 @@ describe('Delete blog with id', () => {
       .expect(404)
   })
 })
+
+describe('Bump the number of likes', () => {
+  const newBlog = {
+    author: 'AuthorForUpdatingLikes',
+    title: 'BlogForUpdateginLikes',
+    url: 'https://localhostForUpdatingLikes'
+  }
+
+  test('Add one like to blog', async () => {
+    await api.post('/api/blogs/')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async response => {
+        await api.put(`/api/blogs/${response.body.id}`)
+          .send({...newBlog, likes: 1})
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+          .then(response => {
+            expect(response.body).toEqual(
+              expect.objectContaining(
+                {...newBlog, likes: 1}
+              )
+            )
+          })
+      })
+  })
+
+  test('Add one like to blog with missing title results in 400', async () => {
+    await api.post('/api/blogs/')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async response => {
+        await api.put(`/api/blogs/${response.body.id}`)
+          .send({
+            author: newBlog.author,
+            url: newBlog.url,
+            likes: 1
+          })
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+      })
+  })
+
+  test('Add one like to blog with missing author results in 400', async () => {
+    await api.post('/api/blogs/')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async response => {
+        await api.put(`/api/blogs/${response.body.id}`)
+          .send({
+            title: newBlog.title,
+            url: newBlog.url,
+            likes: 1
+          })
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+      })
+  })
+
+  test('Add one like to blog with missing url results in 400', async () => {
+    await api.post('/api/blogs/')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async response => {
+        await api.put(`/api/blogs/${response.body.id}`)
+          .send({
+            author: newBlog.author,
+            title: newBlog.title,
+            likes: 1
+          })
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+      })
+  })
+
+  test('Update a blog with an invalid id returns 404', async () => {
+    await api.put('/api/blogs/64024a78c6c1840cdb3e39a3')
+      .send({
+        author: newBlog.author,
+        title: newBlog.title,
+        url: newBlog.url,
+        likes: 1
+      })
+      .expect(404)
+  })
+
+  test('Update a blog without any id return 404', async () => {
+    await api.put('/api/blogs')
+      .expect(404)
+  })
+})
   
 afterAll(async () => {
   await mongoose.connection.close()
