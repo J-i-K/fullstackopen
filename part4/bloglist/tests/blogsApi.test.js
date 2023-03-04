@@ -8,19 +8,27 @@ const User = require('../models/user')
 const bcrypt = require('bcrypt')
 
 let createdUser
+let authHeader
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
 
   const pwHash = await bcrypt.hash(process.env.PW, 5)
-    const user = new User({
-      username: 'testuser',
-      name: 'User, Test',
-      pwHash: pwHash
-    })
+  const user = new User({
+    username: 'testuser',
+    name: 'User, Test',
+    pwHash: pwHash
+  })
   createdUser = await user.save()
   if (createdUser) {
+    authHeader = await api.post('/api/token')
+      .send({
+        username: createdUser.username,
+        password: process.env.PW
+      })
+      .expect(200)
+      .then(response => authHeader = `Bearer ${response.body.access_token}`)
     const testBlogs = helper.testBlogs
       .map(blog => new Blog(blog))
     const promiseArray = testBlogs.map(blog => {
@@ -31,36 +39,13 @@ beforeEach(async () => {
   }
 }, 10000)
 
-describe('getAllBlogs', () => {
+describe('Get the correct amount of blogs with proper schema', () => {
   test('correct amount of blogs are returned', async () => {
     await api.get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
       .then((response) => {
         expect(response.body).toHaveLength(helper.testBlogs.length)
-      })
-  }, 10000)
-
-  test('id property is included', async () => {
-    await api.get('/api/blogs')
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-      .then((response) => {
-        expect(response.body).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: expect.any(String)
-            })
-          ])
-        )
-      })
-  }, 10000)
-
-  test('user is included for blogs', async () => {
-    await api.get('/api/blogs')
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-      .then((response) => {
         expect(response.body).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -85,14 +70,23 @@ describe('createNewBlog', () => {
 
   test('POST results in status 201 and content-type is json', async () => {
     await api.post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('Unauthenticated POST results in status 401', async () => {
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
       .expect('Content-Type', /application\/json/)
   })
 
   test('Number of blogs is increased by 1', async () => {
     // newBlog.user = createdUser.id
     await api.post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -109,6 +103,7 @@ describe('createNewBlog', () => {
   test('Created blog matches the one sent', async () => {
     // newBlog.user = createdUser.id
     await api.post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -128,6 +123,7 @@ describe('createNewBlog', () => {
   test('If created blog is missing likes property, it will default to 0', async () => {
     delete newBlog.likes
     await api.post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -142,6 +138,7 @@ describe('createNewBlog', () => {
 
   test('If the blog to be created is missing title, return 400', async () => {
     await api.post('/api/blogs')
+      .set('Authorization', authHeader)
       .send({
         author: newBlog.author,
         url: newBlog.url,
@@ -152,11 +149,12 @@ describe('createNewBlog', () => {
 
   test('If the blog to be created is missing url, return 400', async () => {
     await api.post('/api/blogs')
-    .send({
-      author: newBlog.author,
-      title: newBlog.title,
-      // user: createdUser.id
-    })
+      .set('Authorization', authHeader)
+      .send({
+        author: newBlog.author,
+        title: newBlog.title,
+        // user: createdUser.id
+      })
       .expect(400)
   }, 10000)
 })
@@ -170,22 +168,61 @@ describe('Delete blog with id', () => {
 
   test('Delete a blog with an id', async () => {
     await api.post('/api/blogs')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .then(async response => {
         await api.delete(`/api/blogs/${response.body.id}`)
+          .set('Authorization', authHeader)
           .expect(204)
       })
-  })
+  }, 10000)
+
+  test('Delete a blog with an id, but wrong user results in 403', async () => {
+    await api.post('/api/blogs')
+      .set('Authorization', authHeader)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+      .then(async response => {
+        const pwHash = await bcrypt.hash(process.env.PW, 5)
+        const user = new User({
+          username: 'testuser2',
+          name: 'User2, Test',
+          pwHash: pwHash
+        })
+        createdUser = await user.save()
+        if (createdUser) {
+          authHeader = await api.post('/api/token')
+            .send({
+              username: createdUser.username,
+              password: process.env.PW
+            })
+            .expect(200)
+            .then(response =>
+              authHeader = `Bearer ${response.body.access_token}`)
+              await api.delete(`/api/blogs/${response.body.id}`)
+              .set('Authorization', authHeader)
+              .expect(403)
+          }
+        })
+  }, 10000)
 
   test('Delete a blog with an invalid id returns 404', async () => {
     await api.delete('/api/blogs/64024a78c6c1840cdb3e39a3')
+      .set('Authorization', authHeader)
       .expect(404)
+  })
+
+  test('Unauthenticated DELETE results int 401', async () => {
+    await api.delete('/api/blogs/64024a78c6c1840cdb3e39a3')
+      .expect(401)
   })
 
   test('Delete a blog without any id return 404', async () => {
     await api.delete('/api/blogs')
+      .set('Authorization', authHeader)
       .expect(404)
   })
 })
@@ -197,14 +234,22 @@ describe('Bump the number of likes', () => {
     url: 'https://localhostForUpdatingLikes'
   }
 
+  test('Unauthenticated PUT results int 401', async () => {
+    await api.put('/api/blogs/64024a78c6c1840cdb3e39a3')
+      .send(newBlog)
+      .expect(401)
+  })
+
   test('Add one like to blog', async () => {
     newBlog.user = createdUser.id
     await api.post('/api/blogs/')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .then(async response => {
         await api.put(`/api/blogs/${response.body.id}`)
+          .set('Authorization', authHeader)
           .send({...newBlog, likes: 1})
           .expect(200)
           .expect('Content-Type', /application\/json/)
@@ -220,11 +265,13 @@ describe('Bump the number of likes', () => {
 
   test('Add one like to blog with missing title results in 400', async () => {
     await api.post('/api/blogs/')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .then(async response => {
         await api.put(`/api/blogs/${response.body.id}`)
+          .set('Authorization', authHeader)
           .send({
             author: newBlog.author,
             url: newBlog.url,
@@ -238,11 +285,13 @@ describe('Bump the number of likes', () => {
 
   test('Add one like to blog with missing author results in 400', async () => {
     await api.post('/api/blogs/')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .then(async response => {
         await api.put(`/api/blogs/${response.body.id}`)
+          .set('Authorization', authHeader)
           .send({
             title: newBlog.title,
             url: newBlog.url,
@@ -256,11 +305,13 @@ describe('Bump the number of likes', () => {
 
   test('Add one like to blog with missing url results in 400', async () => {
     await api.post('/api/blogs/')
+      .set('Authorization', authHeader)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .then(async response => {
         await api.put(`/api/blogs/${response.body.id}`)
+          .set('Authorization', authHeader)
           .send({
             author: newBlog.author,
             title: newBlog.title,
@@ -274,6 +325,7 @@ describe('Bump the number of likes', () => {
 
   test('Update a blog with an invalid id returns 404', async () => {
     await api.put('/api/blogs/64024a78c6c1840cdb3e39a3')
+      .set('Authorization', authHeader)
       .send({
         author: newBlog.author,
         title: newBlog.title,
@@ -286,6 +338,7 @@ describe('Bump the number of likes', () => {
 
   test('Update a blog without any id return 404', async () => {
     await api.put('/api/blogs')
+      .set('Authorization', authHeader)
       .expect(404)
   })
 })

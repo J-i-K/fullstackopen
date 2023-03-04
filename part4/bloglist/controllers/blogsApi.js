@@ -1,5 +1,6 @@
 const blogsApiRouter = require('express').Router()
 const Blog = require('../models/blog')
+const user = require('../models/user')
 const User = require('../models/user')
 
 blogsApiRouter.get('/', async (request, response) => {
@@ -9,15 +10,20 @@ blogsApiRouter.get('/', async (request, response) => {
 })
 
 blogsApiRouter.post('/', async (request, response) => {
+  if (!request?.user?._id) {
+    return response.status(401).json({
+        error: 'invalid token'
+    })
+  }
   const body = request.body
-  const users = await User.find({})
-  if (users.length > 0) {
-    const user = users[0]
+  const user = request.user
+
+  if (user) {
     const blog = new Blog({
-        author: body.author,
-        title: body.title,
-        url: body.url,
-        user: user.id
+      author: body.author,
+      title: body.title,
+      url: body.url,
+      user: user.id
     })
 
     if (!blog.title || !blog.url) {
@@ -38,12 +44,27 @@ blogsApiRouter.post('/', async (request, response) => {
 })
 
 blogsApiRouter.delete('/:id', async (request, response) => {
-  const blogId = request.params.id
-  const deletedBlog = await Blog.findByIdAndRemove(blogId)
-  if (deletedBlog) {
-    response.status(204).json({
-      status: `Blog with id:${deletedBlog.id} deleted`
+  if (!request?.user?._id) {
+    return response.status(401).json({
+        error: 'invalid token'
     })
+  }
+  const blogId = request.params.id
+  const toBeDeletedBlog = await Blog.findById(blogId)
+  if (toBeDeletedBlog) {
+    if (toBeDeletedBlog.user.toString() === request.user._id.toString()) {
+      const deletedBlog = await Blog.findByIdAndRemove(toBeDeletedBlog._id.toString())
+      if (deletedBlog) {
+        response.status(204).json({
+          status: `Blog with id:${deletedBlog.id} deleted`
+        })
+      }
+    } else {
+        response.status(403).json({
+            error: 'Forbidden'
+
+        })
+    }
   } else {
     response.status(404).json({
       error: 'Not found'
@@ -52,6 +73,11 @@ blogsApiRouter.delete('/:id', async (request, response) => {
 })
 
 blogsApiRouter.put('/:id', async (request, response) => {
+  if (!request?.user?._id) {
+    return response.status(401).json({
+        error: 'invalid token'
+    })
+  }
   const blogId = request.params.id
   const body = request.body
   if (body.author && body.title && body.url) {

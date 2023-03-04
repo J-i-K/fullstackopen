@@ -7,6 +7,8 @@ const mongoose = require('mongoose')
 const blogsApiRouter = require('./controllers/blogsApi')
 const usersApiRouter = require('./controllers/usersApi')
 const ErrorHandler = require('./middleware/errorHandler')
+const tokenApiRouter = require('./controllers/tokenApi')
+const tokenHelper = require('./middleware/tokenHelper')
 
 mongoose.set('strictQuery', false)
 
@@ -16,8 +18,11 @@ mongoose.connect(mongoUrl)
 app.use(cors())
 app.use(express.json())
 
-app.use('/api/blogs', blogsApiRouter)
+// app.use(tokenHelper)
+
+app.use('/api/blogs', tokenHelper, blogsApiRouter)
 app.use('/api/users', usersApiRouter)
+app.use('/api/token', tokenApiRouter)
 
 app.use(ErrorHandler)
 
